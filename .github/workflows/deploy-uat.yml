@@ -1,0 +1,26 @@
+name: Deploy Zendesk App to SB1 when code is pushed to uat branch
+
+on:
+  push:
+    # When changes are pushed to sb1 branch
+    branches: [uat]
+
+jobs:
+  build:
+    # GitHub creates an ubuntu sandbox to execute the deployment job
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code from uat branch
+      - uses: zendesk/checkout@v2
+
+      # Create .zat from Actions secrets which contain deployment information
+      - name: Add ZAT Config
+        env:
+          ZAT_SB1: ${{ secrets.ZAT_SB1 }}
+        run: |
+          echo $ZAT_SB1 >> .zat
+
+      # Deploy to the Zendesk environment with the information specified in .zat
+      - name: ZAT Deploy
+        uses: zendesk/zat-deploy@master

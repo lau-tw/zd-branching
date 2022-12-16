@@ -1,0 +1,31 @@
+name: Deploy Zendesk App to production (fake)
+
+on:
+  push:
+    # When changes are pushed to main branch
+    branches: [main]
+
+jobs:
+  build:
+    # GitHub creates an ubuntu sandbox to execute the deployment job
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code from main branch
+      - uses: zendesk/checkout@v2
+
+      # Create .zat from Actions secrets which contain deployment information
+      - name: Add ZAT Config
+        env:
+          ZAT_DEV: ${{ secrets.ZAT_MYDEV }}
+        run: |
+          echo $ZAT_DEV >> .zat
+
+      - name: My Test
+        run: |
+          pwd
+          ls -la
+
+      # Deploy to the Zendesk environment with the information specified in .zat
+      - name: ZAT Deploy
+        uses: zendesk/zat-deploy@master
